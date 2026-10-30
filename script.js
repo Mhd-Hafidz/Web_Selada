@@ -8,7 +8,7 @@
     var DEF = {
         firebase: 'https://smart-farming-selada-default-rtdb.asia-southeast1.firebasedatabase.app/kelompok2.json',
         poll: 2000, fetchN: 300, unit: 'C', clock: '24', theme: 'system', forceDemo: false,
-        dry: 60, wet: 80, camIp: '',
+        dry: 60, wet: 80, camIp: '', portalIp: '192.168.4.1',
         rules: { dry: { on: true }, wet: { on: true }, tmax: { on: true, v: 32 }, tmin: { on: true, v: 15 }, hmin: { on: true, v: 40 }, off: { on: true, v: 15 } }
     };
     function clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -516,8 +516,10 @@
         camstate.innerHTML = CAMICON + '<b></b><p></p>';
         camstate.querySelector('b').textContent = title; camstate.querySelector('p').textContent = text;
     }
-    function camIdle() { camMsg('Kamera belum terhubung', 'Masukkan IP yang tampil di portal ESP32-CAM, atau pakai 192.168.4.1 saat tersambung ke WiFi ESP32-CAM-SELADA.'); }
+    function camIdle() { camMsg('Kamera belum terhubung', 'Masukkan IP kamera yang tampil di portal ESP32-CAM. IP portal (bawaan 192.168.4.1) diatur terpisah.'); }
     function cleanIp(v) { return v.trim().replace(/^https?:\/\//, '').replace(/[\/?#].*$/, ''); }
+    function portalHost() { return S.portalIp || '192.168.4.1'; }
+    function updatePortalLink() { var p = $('#portal'); p.href = 'http://' + portalHost() + '/'; p.textContent = 'Buka portal kamera (' + portalHost() + ')'; p.hidden = false; }
     function camUrl(path) { return 'http://' + S.camIp + path + (path.indexOf('?') < 0 ? '?' : '&') + 't=' + Date.now(); }
     function camOk() { camimg.hidden = false; camstate.hidden = true; $('#livebadge').hidden = false; }
     function camFail() {
@@ -536,7 +538,7 @@
         if (!S.camIp) { camIdle(); return; }
         camStop(); cam.run = true; cam.want = true;
         camMsg('Menghubungkan kamera…', 'Memuat dari ' + S.camIp + '.');
-        $('#camOff').hidden = false; var p = $('#portal'); p.href = 'http://' + S.camIp + '/'; p.hidden = false;
+        $('#camOff').hidden = false; updatePortalLink();
         camimg.onerror = camFail;
         if (cam.mode === 'stream') { camimg.onload = camOk; camimg.src = camUrl('/stream'); }
         else {
@@ -544,7 +546,7 @@
             camimg.src = camUrl('/capture');
         }
     }
-    function camEnter() { $('#camip').value = S.camIp || ''; if (cam.want && S.camIp) camStart(); else if (!cam.run) camIdle(); renderGallery(); }
+    function camEnter() { $('#camip').value = S.camIp || ''; $('#portalip').value = S.portalIp || ''; updatePortalLink(); if (cam.want && S.camIp) camStart(); else if (!cam.run) camIdle(); renderGallery(); }
     function camLeave() {
         exitFull();
         try {
@@ -704,9 +706,14 @@
             S.camIp = ip; save(); camStart();
         });
         $('#camip').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('#camGo').click(); });
-        $('#useAp').addEventListener('click', function () { $('#camip').value = '192.168.4.1'; $('#camGo').click(); });
+        $('#portalSave').addEventListener('click', function () {
+            var ip = cleanIp($('#portalip').value) || '192.168.4.1';
+            S.portalIp = ip; $('#portalip').value = ip; save(); updatePortalLink(); toast('IP portal disimpan: ' + ip);
+        });
+        $('#portalip').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('#portalSave').click(); });
+        $('#useAp').addEventListener('click', function () { $('#portalip').value = '192.168.4.1'; $('#portalSave').click(); });
         $('#camReload').addEventListener('click', function () { camStart(); });
-        $('#camOff').addEventListener('click', function () { cam.want = false; camStop(); camIdle(); $('#camOff').hidden = true; $('#portal').hidden = true; });
+        $('#camOff').addEventListener('click', function () { cam.want = false; camStop(); camIdle(); $('#camOff').hidden = true; });
         $('#camMode').addEventListener('click', function (e) {
             var b = e.target.closest('button'); if (!b) return;
             cam.mode = b.dataset.m;
@@ -796,7 +803,7 @@
             } catch (e) { m.className = 'msg err'; m.textContent = 'Tidak bisa membaca alamat ini. Cek URL, aturan baca Firebase, dan koneksi internet.'; }
         });
         $('#setReset').addEventListener('click', function () {
-            var ip = S.camIp; S = clone(DEF); S.camIp = ip; save(); applyTheme(); fillSettings(); buildZones(); buildRules(); restart(); toast('Pengaturan dikembalikan ke bawaan.');
+            var ip = S.camIp, pip = S.portalIp; S = clone(DEF); S.camIp = ip; S.portalIp = pip; save(); applyTheme(); fillSettings(); buildZones(); buildRules(); restart(); toast('Pengaturan dikembalikan ke bawaan.');
         });
     }
 
