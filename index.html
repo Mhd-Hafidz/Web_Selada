@@ -53,7 +53,7 @@
                     </svg>
                     <div>
                         <h1>Selada Keriting</h1>
-                       <p>Kelompok 6 · Botanic Sync</p>
+                        <p>Kelompok 6 · Botanic Sync</p>
                     </div>
                 </div>
                 <button class="sideclose" type="button" id="sideclose" aria-label="Tutup menu"><svg viewBox="0 0 24 24"
@@ -278,10 +278,19 @@
                                 <h2>Koneksi kamera</h2>
                             </div>
                             <div class="field">
-                                <div class="t"><b>Alamat IP</b><span>Dari portal ESP32-CAM.</span></div>
+                                <div class="t"><b>IP kamera</b><span>IP stream di WiFi rumah (tampil di portal setelah
+                                        tersambung).</span></div>
                                 <div class="ctl"><input type="text" id="camip" inputmode="decimal" autocomplete="off"
                                         placeholder="192.168.1.23"><button class="btn" type="button"
                                         id="camGo">Hubungkan</button></div>
+                            </div>
+                            <div class="field">
+                                <div class="t"><b>IP portal</b><span>Alamat halaman pengaturan ESP32-CAM. Terpisah dari
+                                        IP
+                                        kamera.</span></div>
+                                <div class="ctl"><input type="text" id="portalip" inputmode="decimal" autocomplete="off"
+                                        placeholder="192.168.4.1"><button class="btn ghost" type="button"
+                                        id="portalSave">Simpan</button></div>
                             </div>
                             <div class="field">
                                 <div class="t"><b>Cara tampil</b><span>Foto berkala lebih ringan untuk ESP32-CAM.</span>
@@ -303,7 +312,7 @@
                             </div>
                             <div class="chips"
                                 style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:4px">
-                                <button class="btn ghost small" type="button" id="useAp">Pakai 192.168.4.1</button>
+                                <button class="btn ghost small" type="button" id="useAp">Portal: 192.168.4.1</button>
                                 <a class="link" id="portal" href="#" target="_blank" rel="noopener" hidden>Buka portal
                                     kamera</a>
                             </div>
@@ -571,12 +580,13 @@
                                 </li>
                                 <li>
                                     <div><b>Nyalakan ESP32-CAM.</b> Sambungkan ke WiFi <code>ESP32-CAM-SELADA</code>,
-                                        buka <code>192.168.4.1</code>, isi WiFi yang sama, dan catat IP yang muncul.
+                                        buka <code>192.168.4.1</code> (itulah IP portal), isi WiFi yang sama, dan catat
+                                        IP kamera yang muncul. IP kamera berbeda dari IP portal.
                                     </div>
                                 </li>
                                 <li>
-                                    <div><b>Buka halaman Kamera</b> di dashboard ini, masukkan IP tadi, lalu klik
-                                        Hubungkan.</div>
+                                    <div><b>Buka halaman Kamera</b> di dashboard ini, masukkan IP kamera tadi, lalu klik
+                                        Hubungkan. IP portal diisi di kolom terpisah (bawaan 192.168.4.1).</div>
                                 </li>
                             </ol>
                         </article>
